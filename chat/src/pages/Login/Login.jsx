@@ -32,7 +32,7 @@ const Login = () => {
           required
         />
         <button type="submit">
-          {currentState === "Sign up" ? "Create account" : "Login"}
+          {currentState === "Sign up" ? "Create Account" : "Login"}
         </button>
 
         <div className="login-term">
