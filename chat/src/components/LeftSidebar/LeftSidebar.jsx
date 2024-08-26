@@ -27,7 +27,7 @@ const LeftSidebar = () => {
       <div className="ls-list">
         {Array(12)
           .fill("")
-          .map((item, index) => (
+          .map((index) => (
             <div key={index} className="friends">
               <img src={assets.profile_img} alt="profile_img" />
               <div>
