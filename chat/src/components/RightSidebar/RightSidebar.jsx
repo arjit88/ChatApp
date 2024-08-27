@@ -8,7 +8,7 @@ const RightSidebar = () => {
       <div className="rs-profile">
         <img src={assets.profile_img} alt="profile_img" />
         <h3>
-          Jane Doe{" "}
+          Jane Doe
           <img src={assets.green_dot} className="dot" alt="green_dot" />
         </h3>
         <p>Hey there, I am Jane Doe using chat app.</p>
