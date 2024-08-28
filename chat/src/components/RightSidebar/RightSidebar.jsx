@@ -40,12 +40,6 @@ const RightSidebar = () => {
               alt="images"
             />
           ))}
-          {/* <img src={assets.pic1} alt="pic1" />
-          <img src={assets.pic2} alt="pic2" />
-          <img src={assets.pic3} alt="pic3" />
-          <img src={assets.pic4} alt="pic4" />
-          <img src={assets.pic1} alt="pic1" />
-          <img src={assets.pic2} alt="pic2" /> */}
         </div>
       </div>
       <button onClick={() => logout()}>Logout</button>
