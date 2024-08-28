@@ -1,8 +1,107 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import "./LeftSidebar.css";
 import assets from "../../assets/assets";
+import { useNavigate } from "react-router-dom";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { AppContext } from "../../context/AppContext";
+import { toast } from "react-toastify";
 
 const LeftSidebar = () => {
+  const navigate = useNavigate();
+  const {
+    userData,
+    chatData,
+    chatUser,
+    setChatUser,
+    setMessagesId,
+    messagesId,
+  } = useContext(AppContext);
+
+  const [user, setUser] = useState(null);
+  const [showSearch, setshowSearch] = useState(false);
+
+  const inputHandler = async (e) => {
+    try {
+      const input = e.target.value;
+      if (input) {
+        setshowSearch(true);
+        const userRef = collection(db, "users");
+        const q = query(userRef, where("username", "==", input.toLowerCase()));
+        const querrySnap = await getDocs(q);
+        if (!querrySnap.empty && querrySnap.docs[0].data().id !== userData.id) {
+          let userExist = false;
+          chatData.map((user) => {
+            if (user.rId === querrySnap.docs[0].data().id) {
+              userExist = true;
+            }
+          });
+          if (!userExist) {
+            setUser(querrySnap.docs[0].data());
+          }
+        } else {
+          setUser(null);
+        }
+      } else {
+        setshowSearch(false);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.code);
+    }
+  };
+
+  const addChat = async () => {
+    const messagesRef = collection(db, "messages");
+    const chatsRef = collection(db, "chats");
+    try {
+      const newMessageRef = doc(messagesRef);
+
+      await setDoc(newMessageRef, {
+        createAt: serverTimestamp(),
+        messages: [],
+      });
+
+      await updateDoc(doc(chatsRef, user.id), {
+        chatsData: arrayUnion({
+          messageId: newMessageRef.id,
+          lastMessage: "",
+          rId: userData.id,
+          updatedAt: Date.now(),
+          messageSeen: true,
+        }),
+      });
+
+      await updateDoc(doc(chatsRef, userData.id), {
+        chatsData: arrayUnion({
+          messageId: newMessageRef.id,
+          lastMessage: "",
+          rId: user.id,
+          updatedAt: Date.now(),
+          messageSeen: true,
+        }),
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message);
+    }
+  };
+
+  const setChat = async (item) => {
+    setMessagesId(item.messageId);
+    setChatUser(item);
+  };
+
   return (
     <div className="ls">
       <div className="ls-top">
@@ -11,7 +110,7 @@ const LeftSidebar = () => {
           <div className="menu">
             <img src={assets.menu_icon} alt="menu_icon" />
             <div className="sub-menu">
-              <p>Edit Profile</p>
+              <p onClick={() => navigate("/profile")}>Edit Profile</p>
               <hr />
               <p>Logout</p>
             </div>
@@ -20,22 +119,31 @@ const LeftSidebar = () => {
 
         <div className="ls-search">
           <img src={assets.search_icon} alt="search_icon" />
-          <input type="text" placeholder="Search here..." />
+          <input
+            onChange={inputHandler}
+            type="text"
+            placeholder="Search here..."
+          />
         </div>
       </div>
 
       <div className="ls-list">
-        {Array(12)
-          .fill("")
-          .map((index) => (
-            <div key={index} className="friends">
-              <img src={assets.profile_img} alt="profile_img" />
+        {showSearch && user ? (
+          <div onClick={addChat} className="friends add-user">
+            <img src={user.avatar} alt="avatar" />
+            <p>{user.name}</p>
+          </div>
+        ) : (
+          chatData.map((item, index) => (
+            <div onClick={() => setChat(item)} key={index} className="friends">
+              <img src={item.userData.avatar} alt="profile_img" />
               <div>
-                <p>Jane Doe</p>
-                <span>Hello, How are you?</span>
+                <p>{item.userData.name}</p>
+                <span>{item.lastMessage}</span>
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
     </div>
   );
