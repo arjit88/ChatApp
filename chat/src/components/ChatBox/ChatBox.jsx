@@ -14,8 +14,15 @@ import { toast } from "react-toastify";
 import upload from "../../lib/upload";
 
 const ChatBox = () => {
-  const { userData, messagesId, chatUser, messages, setMessages } =
-    useContext(AppContext);
+  const {
+    userData,
+    messagesId,
+    chatUser,
+    messages,
+    setMessages,
+    chatVisible,
+    setChatVisible,
+  } = useContext(AppContext);
 
   const [input, setInput] = useState("");
 
@@ -122,73 +129,73 @@ const ChatBox = () => {
   }, [messagesId]);
 
   return chatUser ? (
-    <div>
-      <div className="chat-box">
-        <div className="chat-user">
-          <img src={chatUser.userData.avatar} alt="profile_img" />
-          <p>
-            {chatUser.userData.name}
-            {Date.now() - chatUser.userData.lastSeen <= 70000 ? (
-              <img className="dot" src={assets.green_dot} alt="green_dot" />
-            ) : null}
-          </p>
-          <img src={assets.help_icon} className="help" alt="help_icon" />
-        </div>
+    <div className={`chat-box ${chatVisible ? "" : "hidden"}`}>
+      <div className="chat-user">
+        <img src={chatUser.userData.avatar} alt="profile_img" />
+        <p>
+          {chatUser.userData.name}
+          {Date.now() - chatUser.userData.lastSeen <= 70000 ? (
+            <img className="dot" src={assets.green_dot} alt="green_dot" />
+          ) : null}
+        </p>
+        <img src={assets.help_icon} className="help" alt="help_icon" />
+        <img
+          onClick={() => setChatVisible(false)}
+          src={assets.arrow_icon}
+          className="arrow"
+          alt="arrow_icon"
+        />
+      </div>
 
-        <div className="chat-msg">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={msg.sId === userData.id ? "s-msg" : "r-msg"}
-            >
-              {msg["image"] ? (
-                <img className="msg-img" src={msg.image} alt="image" />
-              ) : (
-                <p className="msg">{msg.text}</p>
-              )}
+      <div className="chat-msg">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={msg.sId === userData.id ? "s-msg" : "r-msg"}
+          >
+            {msg["image"] ? (
+              <img className="msg-img" src={msg.image} alt="image" />
+            ) : (
+              <p className="msg">{msg.text}</p>
+            )}
 
-              <div>
-                <img
-                  src={
-                    msg.sId === userData.id
-                      ? userData.avatar
-                      : chatUser.userData.avatar
-                  }
-                  alt="profile_img"
-                />
-                <p>{convertTimestamp(msg.createdAt)}</p>
-              </div>
+            <div>
+              <img
+                src={
+                  msg.sId === userData.id
+                    ? userData.avatar
+                    : chatUser.userData.avatar
+                }
+                alt="profile_img"
+              />
+              <p>{convertTimestamp(msg.createdAt)}</p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="chat-input">
-          <input
-            onChange={(e) => setInput(e.target.value)}
-            value={input}
-            type="text"
-            placeholder="Send a message"
-          />
-          <input
-            onChange={sendImage}
-            type="file"
-            id="image"
-            accept="image/png, image/jpeg"
-            hidden
-          />
-          <label htmlFor="image">
-            <img src={assets.gallery_icon} alt="gallery_icon" />
-          </label>
-          <img
-            onClick={sendMessage}
-            src={assets.send_button}
-            alt="send_button"
-          />
-        </div>
+      <div className="chat-input">
+        <input
+          onChange={(e) => setInput(e.target.value)}
+          value={input}
+          type="text"
+          placeholder="Send a message"
+        />
+        <input
+          onChange={sendImage}
+          type="file"
+          id="image"
+          accept="image/png, image/jpeg"
+          hidden
+        />
+        <label htmlFor="image">
+          <img src={assets.gallery_icon} alt="gallery_icon" />
+        </label>
+        <img onClick={sendMessage} src={assets.send_button} alt="send_button" />
       </div>
     </div>
   ) : (
-    <div className="chat-welcome">
+    <div className={`chat-welcome ${chatVisible ? "" : "hidden"}`}>
       <img src={assets.logo_icon} alt="logo_icon" />
       <p>Chat anytime, anywhere</p>
     </div>
