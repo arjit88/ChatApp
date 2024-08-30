@@ -119,6 +119,17 @@
   border-radius: 10px;
 }
 
+.emoji {
+  cursor: pointer;
+  position: relative;
+}
+
+.picker {
+  position: absolute;
+  bottom: 50px;
+  right: 0;
+}
+
 .chat-welcome {
   width: 100%;
   display: flex;

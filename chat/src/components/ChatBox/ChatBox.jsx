@@ -12,6 +12,7 @@ import {
 import { db } from "../../config/firebase";
 import { toast } from "react-toastify";
 import upload from "../../lib/upload";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatBox = () => {
   const {
@@ -25,6 +26,7 @@ const ChatBox = () => {
   } = useContext(AppContext);
 
   const [input, setInput] = useState("");
+  const [open, setOpen] = useState(false);
 
   const sendMessage = async () => {
     try {
@@ -64,6 +66,11 @@ const ChatBox = () => {
       toast.error(error.message);
     }
     setInput("");
+  };
+
+  const handleEmoji = (e) => {
+    setInput((prev) => prev + e.emoji);
+    setOpen(false);
   };
 
   const sendImage = async (e) => {
@@ -181,6 +188,16 @@ const ChatBox = () => {
           type="text"
           placeholder="Send a message"
         />
+        <div className="emoji">
+          <img
+            src="./emoji.png"
+            alt="emoji"
+            onClick={() => setOpen((prev) => !prev)}
+          />
+          <div className="picker">
+            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
+          </div>
+        </div>
         <input
           onChange={sendImage}
           type="file"
