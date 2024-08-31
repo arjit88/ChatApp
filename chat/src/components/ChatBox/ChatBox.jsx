@@ -13,8 +13,15 @@ import { db } from "../../config/firebase";
 import { toast } from "react-toastify";
 import upload from "../../lib/upload";
 import EmojiPicker from "emoji-picker-react";
+import { BsEmojiSmile } from "react-icons/bs";
+import { MdOutlineMicNone } from "react-icons/md";
+import { MdOutlineMicOff } from "react-icons/md";
+import useSpeechRecognitions from "../../context/UseSpeechRecognition";
 
 const ChatBox = () => {
+  const [input, setInput] = useState("");
+  const [open, setOpen] = useState(false);
+
   const {
     userData,
     messagesId,
@@ -25,8 +32,16 @@ const ChatBox = () => {
     setChatVisible,
   } = useContext(AppContext);
 
-  const [input, setInput] = useState("");
-  const [open, setOpen] = useState(false);
+  const {
+    listening,
+    stopListening,
+    startListening,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognitions(setInput);
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
 
   const sendMessage = async () => {
     try {
@@ -189,9 +204,12 @@ const ChatBox = () => {
           placeholder="Send a message"
         />
         <div className="emoji">
-          <img
-            src="./emoji.png"
-            alt="emoji"
+          <BsEmojiSmile
+            style={{
+              height: "23px",
+              width: "23px",
+              fill: "rgb(160, 160, 160)",
+            }}
             onClick={() => setOpen((prev) => !prev)}
           />
           <div className="picker">
@@ -208,6 +226,33 @@ const ChatBox = () => {
         <label htmlFor="image">
           <img src={assets.gallery_icon} alt="gallery_icon" />
         </label>
+
+        {listening ? (
+          <MdOutlineMicOff
+            style={{
+              height: "23px",
+              width: "20px",
+              fill: "rgb(160, 160, 160)",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              stopListening();
+            }}
+          />
+        ) : (
+          <MdOutlineMicNone
+            style={{
+              height: "23px",
+              width: "20px",
+              fill: "rgb(160, 160, 160)",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              startListening();
+            }}
+          />
+        )}
+
         <img onClick={sendMessage} src={assets.send_button} alt="send_button" />
       </div>
     </div>

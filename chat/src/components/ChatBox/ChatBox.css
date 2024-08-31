@@ -120,8 +120,12 @@
 }
 
 .emoji {
+  fill: rgb(160, 160, 160);
   cursor: pointer;
   position: relative;
+  display: flex;
+  align-items: center;
+  height: 8px;
 }
 
 .picker {
