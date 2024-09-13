@@ -48,6 +48,10 @@
   color: #808080;
 }
 
+.login-term p {
+  margin-top: 16px;
+}
+
 .login-forgot {
   display: flex;
   flex-direction: column;
