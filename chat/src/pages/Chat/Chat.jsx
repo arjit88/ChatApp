@@ -18,13 +18,13 @@ const Chat = () => {
   return (
     <div className="chat">
       {loading ? (
-        <div class="text-center">
+        <div className="text-center">
           <div
-            class="spinner-border"
+            className="spinner-border"
             style={{ width: "5rem", height: "5rem" }}
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       ) : (

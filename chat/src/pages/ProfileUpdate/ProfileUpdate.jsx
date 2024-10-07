@@ -13,7 +13,7 @@ const ProfileUpdate = () => {
   const navigate = useNavigate();
   const { setUserData } = useContext(AppContext);
 
-  const [image, setImage] = useState(false);
+  const [image, setImage] = useState(null); // Changed initial state to null
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [uid, setUid] = useState("");
@@ -24,6 +24,7 @@ const ProfileUpdate = () => {
     try {
       if (!prevImage && !image) {
         toast.error("Upload profile picture");
+        return; // Prevent further execution if no image
       }
       const docRef = doc(db, "users", uid);
       if (image) {
@@ -50,25 +51,23 @@ const ProfileUpdate = () => {
   };
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUid(user.uid);
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
-        if (docSnap.data().name) {
-          setName(docSnap.data().name);
-        }
-        if (docSnap.data().bio) {
-          setBio(docSnap.data().bio);
-        }
-        if (docSnap.data().avatar) {
-          setPrevImage(docSnap.data().avatar);
+        if (docSnap.data()) {
+          setName(docSnap.data().name || ""); // Ensure it's a string
+          setBio(docSnap.data().bio || ""); // Ensure it's a string
+          setPrevImage(docSnap.data().avatar || ""); // Ensure it's a string
         }
       } else {
         navigate("/");
       }
     });
-  }, []);
+
+    return () => unsubscribe(); // Cleanup subscription
+  }, [navigate]);
 
   return (
     <div className="profile">
@@ -97,7 +96,7 @@ const ProfileUpdate = () => {
             required
           />
           <textarea
-            onChange={(e) => setBio(e.target.bio)}
+            onChange={(e) => setBio(e.target.value)} // Corrected this line
             value={bio}
             placeholder="Write profile bio"
             required

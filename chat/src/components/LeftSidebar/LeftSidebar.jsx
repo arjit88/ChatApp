@@ -41,16 +41,13 @@ const LeftSidebar = () => {
         setshowSearch(true);
         const userRef = collection(db, "users");
         const q = query(userRef, where("username", "==", input.toLowerCase()));
-        const querrySnap = await getDocs(q);
-        if (!querrySnap.empty && querrySnap.docs[0].data().id !== userData.id) {
-          let userExist = false;
-          chatData.map((user) => {
-            if (user.rId === querrySnap.docs[0].data().id) {
-              userExist = true;
-            }
-          });
-          if (!userExist) {
-            setUser(querrySnap.docs[0].data());
+        const querySnap = await getDocs(q);
+        if (!querySnap.empty && querySnap.docs[0].data().id !== userData.id) {
+          const userExists = chatData.some(
+            (user) => user.rId === querySnap.docs[0].data().id
+          );
+          if (!userExists) {
+            setUser(querySnap.docs[0].data());
           }
         } else {
           setUser(null);
@@ -60,7 +57,7 @@ const LeftSidebar = () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error(error.code);
+      toast.error(error.message);
     }
   };
 
@@ -75,23 +72,22 @@ const LeftSidebar = () => {
         messages: [],
       });
 
+      const chatDataPayload = {
+        messageId: newMessageRef.id,
+        lastMessage: "",
+        rId: userData.id,
+        updatedAt: Date.now(),
+        messageSeen: true,
+      };
+
       await updateDoc(doc(chatsRef, user.id), {
-        chatsData: arrayUnion({
-          messageId: newMessageRef.id,
-          lastMessage: "",
-          rId: userData.id,
-          updatedAt: Date.now(),
-          messageSeen: true,
-        }),
+        chatsData: arrayUnion(chatDataPayload),
       });
 
       await updateDoc(doc(chatsRef, userData.id), {
         chatsData: arrayUnion({
-          messageId: newMessageRef.id,
-          lastMessage: "",
+          ...chatDataPayload,
           rId: user.id,
-          updatedAt: Date.now(),
-          messageSeen: true,
         }),
       });
 
@@ -120,10 +116,23 @@ const LeftSidebar = () => {
       const userChatsRef = doc(db, "chats", userData.id);
       const userChatsSnapshot = await getDoc(userChatsRef);
       const userChatsData = userChatsSnapshot.data();
+
+      // Check if userChatsData and chatsData are defined
+      if (!userChatsData || !userChatsData.chatsData) {
+        throw new Error("User chat data is not available.");
+      }
+
       const chatIndex = userChatsData.chatsData.findIndex(
         (c) => c.messageId === item.messageId
       );
+
+      // Check if chatIndex is valid
+      if (chatIndex === -1) {
+        throw new Error("Chat not found.");
+      }
+
       userChatsData.chatsData[chatIndex].messageSeen = true;
+
       await updateDoc(userChatsRef, {
         chatsData: userChatsData.chatsData,
       });
@@ -135,7 +144,7 @@ const LeftSidebar = () => {
   };
 
   useEffect(() => {
-    const uodateChatUserData = async () => {
+    const updateChatUserData = async () => {
       if (chatUser) {
         const userRef = doc(db, "users", chatUser.userData.id);
         const userSnap = await getDoc(userRef);
@@ -143,8 +152,8 @@ const LeftSidebar = () => {
         setChatUser((prev) => ({ ...prev, userData: userData }));
       }
     };
-    uodateChatUserData();
-  }, [chatData]);
+    updateChatUserData();
+  }, [chatUser, setChatUser]);
 
   return (
     <div className={`ls ${chatVisible ? "hidden" : ""}`}>

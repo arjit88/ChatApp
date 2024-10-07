@@ -45,7 +45,7 @@
 }
 
 .chat-input img {
-  width: 30px;
+  width: 30px; /* Default size for icons */
   cursor: pointer;
 }
 
@@ -157,16 +157,80 @@
   display: none;
 }
 
+/* Responsive Styles */
 @media (max-width: 900px) {
   .chat-box {
     width: 100%;
     justify-content: center;
   }
+
   .chat-user .arrow {
     display: block;
   }
 
   .chat-user .help {
     display: none;
+  }
+
+  .chat-user p {
+    font-size: 16px; /* Smaller name font */
+  }
+
+  .chat-input {
+    padding: 8px 10px; /* Adjust input padding */
+  }
+
+  .chat-input img {
+    width: 24px; /* Smaller icons on small screens */
+  }
+
+  .chat-input input {
+    font-size: 14px; /* Smaller input font */
+    padding: 5px; /* Adjust padding for smaller input */
+  }
+
+  .msg {
+    max-width: 160px; /* Smaller max width for messages */
+    font-size: 10px; /* Smaller message font size */
+  }
+
+  .msg-img {
+    max-width: 200px; /* Smaller image size */
+  }
+}
+
+@media (max-width: 600px) {
+  .chat-box {
+    height: auto; /* Allow flexibility on small screens */
+  }
+
+  .chat-user p {
+    font-size: 14px; /* Smaller name font */
+  }
+
+  .chat-input {
+    gap: 8px; /* Reduce gap to keep buttons closer */
+  }
+
+  .chat-input img {
+    width: 20px; /* Further reduce icon size */
+  }
+
+  .chat-input input {
+    font-size: 12px; /* Further reduce input font size */
+    padding: 4px; /* Adjust padding for small input */
+  }
+
+  .msg {
+    max-width: 120px; /* Further decrease max width for messages */
+    font-size: 9px; /* Smaller message font size */
+  }
+
+  .msg-img {
+    max-width: 150px; /* Further decrease image size */
+  }
+
+  .chat-welcome p {
+    font-size: 18px; /* Smaller welcome font size */
   }
 }
